@@ -971,6 +971,32 @@ PAGE_HEADERS = {
         ),
         "pill": "AI Analysis"
     },
+    "Batch Intelligence": {
+        "title": "Batch Intelligence",
+        "subtitle": (
+            "Compare operational risk across tomato batches "
+            "and understand intervention priority."
+        ),
+        "pill": "Decision Intelligence"
+    },
+
+    "Capacity Simulator": {
+        "title": "Capacity Stress Test",
+        "subtitle": (
+            "Explore how constrained cold storage and transport "
+            "change intervention decisions."
+        ),
+        "pill": "What-If Analysis"
+    },
+
+    "How HarvestShield Works": {
+        "title": "How HarvestShield Works",
+        "subtitle": (
+            "From visual condition to resource-aware "
+            "intervention priority."
+        ),
+        "pill": "Decision Pipeline"
+    },
 
     "Resource Planner": {
         "title": "Resource Planner",

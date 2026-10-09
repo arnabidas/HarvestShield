@@ -2131,6 +2131,210 @@ elif page == "Capacity Simulator":
 
 
 # ============================================================
+# HOW HARVESTSHIELD WORKS
+# ============================================================
+
+elif page == "How HarvestShield Works":
+
+    st.caption(
+        "Explore the current decision pipeline and the "
+        "planned low-handling V0.2 architecture."
+    )
+
+    def flow_box(title, description, highlight=False):
+        background = "#283421" if highlight else "#232524"
+        border = "#a7ef4e" if highlight else "#414741"
+
+        st.markdown(
+            f"""
+<div style="
+    background:{background};
+    border:1px solid {border};
+    border-radius:16px;
+    padding:18px;
+    text-align:center;
+    margin:6px 0;
+">
+    <div style="
+        color:#a7ef4e;
+        font-weight:800;
+        font-size:17px;
+    ">{title}</div>
+    <div style="
+        color:#e2e8e2;
+        font-size:14px;
+        margin-top:6px;
+    ">{description}</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+    def flow_arrow():
+        st.markdown(
+            '<div style="text-align:center;'
+            'color:#a7ef4e;font-size:28px;">↓</div>',
+            unsafe_allow_html=True
+        )
+
+    current_tab, future_tab = st.tabs(
+        [
+            "Current Prototype",
+            "V0.2 Proposed Workflow"
+        ]
+    )
+
+    with current_tab:
+
+        st.markdown("### Current Working Architecture")
+
+        flow_box(
+            "1. TOMATO IMAGE",
+            "Upload a photograph for visual-condition analysis."
+        )
+        flow_arrow()
+
+        flow_box(
+            "2. MOBILENETV3-SMALL",
+            "Classifies the image as Fresh or Rotten source class."
+        )
+        flow_arrow()
+
+        flow_box(
+            "3. OPERATIONAL CONTEXT",
+            "Temperature, humidity and days since harvest."
+        )
+        flow_arrow()
+
+        flow_box(
+            "4. EXPLAINABLE RISK ENGINE",
+            "Prototype risk score from 0 to 100.",
+            highlight=True
+        )
+        flow_arrow()
+
+        flow_box(
+            "5. RESOURCE PLANNER",
+            "Uses batch quantity, cold storage and transport capacity."
+        )
+        flow_arrow()
+
+        flow_box(
+            "6. PRIORITIZED ACTION PLAN",
+            "Generates provisional heuristic recommendations.",
+            highlight=True
+        )
+
+        st.info(
+            "This is the existing V0.1 functionality. "
+            "The current planner does not yet enforce "
+            "V0.2 food-safety or marketability checks."
+        )
+
+    with future_tab:
+
+        st.markdown(
+            "### Proposed V0.2 Operational Workflow"
+        )
+
+        flow_box(
+            "1. EXISTING SORTING AND GRADING",
+            "Inspect tomatoes during normal handling to avoid "
+            "unpacking and repacking crates."
+        )
+        flow_arrow()
+
+        flow_box(
+            "2. MULTI-IMAGE SAMPLE INSPECTION",
+            "Capture representative tomato samples and "
+            "record their inspection positions."
+        )
+        flow_arrow()
+
+        flow_box(
+            "3. BATCH REGISTRATION",
+            "Associate inspection evidence with a crate ID."
+        )
+        flow_arrow()
+
+        flow_box(
+            "4. STORAGE / DISPATCH DECISION POINT",
+            "Retrieve the inspection record when the "
+            "crate enters logistics planning."
+        )
+        flow_arrow()
+
+        flow_box(
+            "5. CONTEXT + SAFETY SCREENING",
+            "Temperature, humidity, gas-screening status "
+            "and operator-provided handling window."
+        )
+        flow_arrow()
+
+        flow_box(
+            "6. SAFETY AND MARKETABILITY GATE",
+            "Suspected unsafe, rotten or uncertain batches "
+            "are held for qualified human review.",
+            highlight=True
+        )
+        flow_arrow()
+
+        flow_box(
+            "7. RESOURCE-AWARE DECISION ENGINE",
+            "Compare eligible batches against transport "
+            "capacity, storage suitability and transit time."
+        )
+        flow_arrow()
+
+        left, right, third = st.columns(3)
+
+        with left:
+            flow_box(
+                "DISPATCH",
+                "Marketable and time-sensitive batches."
+            )
+
+        with right:
+            flow_box(
+                "STORE",
+                "Marketable batches suitable for storage."
+            )
+
+        with third:
+            flow_box(
+                "HOLD / REVIEW",
+                "Unsafe, unmarketable or uncertain batches."
+            )
+
+        st.warning(
+            "V0.2 is under development. Multi-image crate "
+            "aggregation, gas screening, human approval and "
+            "marketability-aware allocation are not yet "
+            "implemented or validated."
+        )
+
+    st.divider()
+
+    st.markdown("### What makes HarvestShield different?")
+
+    st.markdown(
+        """
+**A basic image classifier:**
+
+Image → Visual Condition
+
+**HarvestShield's intended decision workflow:**
+
+Inspection Evidence → Safety & Marketability → Handling Urgency
+→ Resource Constraints → Feasible Intervention
+
+**Our innovation is the decision layer after detection**, not
+a claim to predict exact remaining shelf life or guarantee that
+every tomato in a crate has been inspected.
+"""
+    )
+
+# ============================================================
 # VALIDATION
 # ============================================================
 

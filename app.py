@@ -1960,6 +1960,175 @@ elif page == "Resource Planner":
             unsafe_allow_html=True
         )
 
+# ============================================================
+# CAPACITY SIMULATOR
+# ============================================================
+
+elif page == "Capacity Simulator":
+
+    st.caption(
+        "What-if analysis: explore how limited storage and "
+        "transport capacity affect batch allocation."
+    )
+
+    if not st.session_state.batches:
+
+        st.info(
+            "Analyze at least two batches to compare scenarios."
+        )
+
+    else:
+
+        st.markdown("### Current Available Resources")
+
+        b1, b2 = st.columns(2)
+
+        b1.metric(
+            "Current Cold Storage",
+            f"{st.session_state.cold_capacity:.0f} kg"
+        )
+
+        b2.metric(
+            "Current Transport",
+            f"{st.session_state.transport_capacity:.0f} kg"
+        )
+
+        st.markdown("### Simulate a New Scenario")
+
+        c1, c2 = st.columns(2)
+
+        sim_cold = c1.number_input(
+            "Simulated Cold Storage (kg)",
+            min_value=0.0,
+            max_value=1000000.0,
+            value=float(st.session_state.cold_capacity),
+            step=10.0,
+            key="sim_cold"
+        )
+
+        sim_transport = c2.number_input(
+            "Simulated Transport (kg)",
+            min_value=0.0,
+            max_value=1000000.0,
+            value=float(st.session_state.transport_capacity),
+            step=10.0,
+            key="sim_transport"
+        )
+
+        st.caption(
+            "Change either value to automatically recalculate "
+            "the scenario. Original resources remain unchanged."
+        )
+
+        try:
+
+            baseline = hs.generate_action_plan(
+                batches=st.session_state.batches,
+                cold_storage_capacity=float(
+                    st.session_state.cold_capacity
+                ),
+                transport_capacity=float(
+                    st.session_state.transport_capacity
+                )
+            )
+
+            simulation = hs.generate_action_plan(
+                batches=st.session_state.batches,
+                cold_storage_capacity=float(sim_cold),
+                transport_capacity=float(sim_transport)
+            )
+
+            st.markdown("### Simulated Intervention Plan")
+
+            for item in simulation["plan"]:
+                render_priority(item)
+
+            st.markdown("### Remaining Capacity")
+
+            r1, r2 = st.columns(2)
+
+            r1.metric(
+                "Cold Storage Remaining",
+                f"{simulation['remaining_cold_storage']:.0f} kg"
+            )
+
+            r2.metric(
+                "Transport Remaining",
+                f"{simulation['remaining_transport']:.0f} kg"
+            )
+
+            st.markdown("### Current Plan vs New Scenario")
+
+            original = {
+                item["batch_id"]: item
+                for item in baseline["plan"]
+            }
+
+            comparison = []
+
+            for item in simulation["plan"]:
+
+                old = original.get(item["batch_id"], {})
+
+                comparison.append({
+                    "Batch": item["batch_id"],
+                    "Risk": item["risk"],
+                    "Quantity kg": item["quantity"],
+                    "Current Action": old.get(
+                        "action", "Review"
+                    ),
+                    "Scenario Action": item.get(
+                        "action", "Review"
+                    ),
+                    "Current Resource": old.get(
+                        "resource_used", "None"
+                    ),
+                    "Scenario Resource": item.get(
+                        "resource_used", "None"
+                    )
+                })
+
+            comparison_df = pd.DataFrame(comparison)
+
+            st.dataframe(
+                comparison_df,
+                hide_index=True,
+                use_container_width=True
+            )
+
+            changed = sum(
+                row["Current Action"] != row["Scenario Action"]
+                or row["Current Resource"] != row["Scenario Resource"]
+                for row in comparison
+            )
+
+            st.metric(
+                "Batches with Changed Allocations",
+                changed
+            )
+
+            st.download_button(
+                "Download Simulation Results",
+                data=comparison_df.to_csv(
+                    index=False
+                ).encode("utf-8"),
+                file_name="harvestshield_capacity_scenario.csv",
+                mime="text/csv"
+            )
+
+            st.warning(
+                "These are provisional V0.1 heuristic "
+                "allocations. The V0.2 safety, marketability, "
+                "gas-screening and handling-window checks "
+                "will be added before dispatch decisions "
+                "are treated as actionable."
+            )
+
+        except Exception as e:
+
+            st.error("Capacity simulation failed.")
+            st.exception(e)
+
 
 # ============================================================
 # VALIDATION

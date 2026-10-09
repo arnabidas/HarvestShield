@@ -1702,6 +1702,104 @@ elif page == "Analyze Batch":
 
 
 # ============================================================
+# BATCH INTELLIGENCE
+# ============================================================
+
+elif page == "Batch Intelligence":
+
+    st.caption(
+        "Compare inspected tomato batches and identify "
+        "which batches need attention first."
+    )
+
+    if not st.session_state.batches:
+        st.info(
+            "No batches available. Analyze tomato batches first."
+        )
+
+    else:
+        df = batch_dataframe()
+
+        # Summary cards
+        c1, c2, c3, c4 = st.columns(4)
+
+        c1.metric("Total Batches", total_batches())
+        c2.metric("High Risk", high_risk_count())
+        c3.metric("Need Attention", attention_count())
+        c4.metric(
+            "Total Quantity",
+            f"{total_quantity():.0f} kg"
+        )
+
+        # Complete batch comparison
+        st.markdown("### Batch Comparison")
+
+        st.dataframe(
+            df,
+            hide_index=True,
+            use_container_width=True
+        )
+
+        # Risk score visualization
+        st.markdown("### Operational Risk Comparison")
+
+        chart_df = df.set_index("Batch")[["Score"]]
+
+        st.bar_chart(
+            chart_df,
+            height=320
+        )
+
+        # Attention ranking
+        st.markdown("### Inspection Attention Ranking")
+
+        ranked = (
+            df.sort_values(
+                by=["Score", "Days"],
+                ascending=[False, False]
+            )
+            .reset_index(drop=True)
+            .copy()
+        )
+
+        ranked.insert(
+            0,
+            "Attention Rank",
+            range(1, len(ranked) + 1)
+        )
+
+        st.dataframe(
+            ranked[
+                [
+                    "Attention Rank",
+                    "Batch",
+                    "Condition",
+                    "Risk",
+                    "Score",
+                    "Quantity kg",
+                    "Days"
+                ]
+            ],
+            hide_index=True,
+            use_container_width=True
+        )
+
+        st.info(
+            "This ranking indicates inspection attention, "
+            "not approval for dispatch. V0.2 safety screening, "
+            "marketability checks and resource allocation "
+            "will determine final handling decisions."
+        )
+
+        # Export comparison
+        st.download_button(
+            label="Download Batch Comparison",
+            data=ranked.to_csv(index=False).encode("utf-8"),
+            file_name="harvestshield_batch_comparison.csv",
+            mime="text/csv"
+        )
+
+# ============================================================
 # RESOURCE PLANNER
 # ============================================================
 

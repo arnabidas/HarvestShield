@@ -842,7 +842,74 @@ def score_chart():
         df,
         height=230
     )
+# ============================================================
+# DECISION TRACE
+# ============================================================
 
+def render_decision_trace(batch):
+
+    st.markdown("### Decision Trace")
+
+    st.caption(
+        "How visual evidence and post-harvest context "
+        "produce the current prototype recommendation."
+    )
+
+    condition = (
+        "Visible deterioration"
+        if batch["source_label"] == "Rotten"
+        else "No obvious deterioration"
+    )
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        st.markdown("**1. Visual Assessment**")
+        st.write(condition)
+        st.caption(
+            f"Classifier confidence: "
+            f"{batch['model_confidence'] * 100:.1f}%"
+        )
+
+    with c2:
+        st.markdown("**2. Handling Context**")
+        st.write(
+            f"Temperature: {batch['temperature']:.1f} °C"
+        )
+        st.write(
+            f"Humidity: {batch['humidity']:.0f}%"
+        )
+        st.write(
+            f"Days since harvest: "
+            f"{batch['days_since_harvest']:.0f}"
+        )
+
+    with c3:
+        st.markdown("**3. Operational Risk**")
+        st.metric(
+            "Risk Score",
+            f"{batch['risk_score']}/100"
+        )
+        st.write(
+            f"Risk category: **{batch['risk']}**"
+        )
+
+    st.markdown("**4. Preliminary Recommendation**")
+
+    st.info(
+        batch.get(
+            "preliminary_action",
+            "Operator review required"
+        )
+    )
+
+    st.caption(
+        "This is the existing V0.1 heuristic. "
+        "It is not a food-safety clearance or a "
+        "validated remaining shelf-life prediction. "
+        "V0.2 safety and marketability checks "
+        "will be integrated separately."
+    )
 
 # ============================================================
 # SIDEBAR
@@ -1604,6 +1671,7 @@ elif page == "Analyze Batch":
                             "preliminary_action"
                         ]
                     )
+                     render_decision_trace(result)
 
 
                     with st.expander(

@@ -881,18 +881,18 @@ with st.sidebar:
     )
 
 
- page = st.radio(
-    "DASHBOARD",
-    [
-        "Overview",
-        "Analyze Batch",
-        "Batch Intelligence",
-        "Resource Planner",
-        "Capacity Simulator",
-        "How HarvestShield Works",
-        "Validation"
-    ]
-)
+    page = st.radio(
+        "DASHBOARD",
+        [
+            "Overview",
+            "Analyze Batch",
+            "Batch Intelligence",
+            "Resource Planner",
+            "Capacity Simulator",
+            "How HarvestShield Works",
+            "Validation"
+        ]
+    )
 
     st.divider()
 

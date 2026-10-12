@@ -1,6 +1,5 @@
 
 from pathlib import Path
-import sys
 
 
 class HarvestShieldBackend:
@@ -23,28 +22,15 @@ class HarvestShieldBackend:
             / "harvestshield_mobilenetv3small_best.pth"
         )
 
-        # Make project modules importable
-        if str(self.ml_dir) not in sys.path:
-            sys.path.insert(
-                0,
-                str(self.ml_dir)
-            )
-
-        if str(self.backend_dir) not in sys.path:
-            sys.path.insert(
-                0,
-                str(self.backend_dir)
-            )
-
-        from inference import (
+        from ml.inference import (
             HarvestShieldConditionModel
         )
 
-        from risk_engine import (
+        from .risk_engine import (
             calculate_risk
         )
 
-        from decision_engine import (
+        from .decision_engine import (
             generate_action_plan
         )
 

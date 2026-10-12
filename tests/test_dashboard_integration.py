@@ -1,5 +1,7 @@
 import unittest
+import types
 from pathlib import Path
+from unittest.mock import patch
 
 from streamlit.testing.v1 import AppTest
 
@@ -88,6 +90,21 @@ class DashboardIntegrationTests(unittest.TestCase):
         next(b for b in self.app.button if b.label == 'Analyze Batch').click().run()
         self.assertFalse(self.app.exception)
         self.assertEqual(self.app.error[0].value, 'Please upload a tomato image.')
+
+
+class ImportCompatibilityTests(unittest.TestCase):
+    def test_dashboard_ignores_cached_legacy_decision_module(self):
+        # A long-running server may retain the module from before rank_batches
+        # existed. Package imports must not resolve to that bare module.
+        legacy = types.ModuleType('decision_engine')
+        with patch.dict('sys.modules', {'decision_engine': legacy}):
+            app = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=60).run()
+            self.assertFalse(app.exception, [e.message for e in app.exception])
+            self.assertFalse(app.error)
+            from backend.harvestshield_backend import HarvestShieldBackend
+            from backend.decision_engine import generate_action_plan
+            backend = HarvestShieldBackend(ROOT)
+            self.assertIs(backend.generate_action_plan_engine, generate_action_plan)
 
 
 if __name__ == '__main__':

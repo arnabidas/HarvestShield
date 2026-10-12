@@ -1,7 +1,6 @@
 
 from pathlib import Path
 from copy import deepcopy
-import sys
 
 import pandas as pd
 import streamlit as st
@@ -14,14 +13,10 @@ import matplotlib.pyplot as plt
 # ============================================================
 
 BASE = Path(__file__).resolve().parent
-BACKEND_DIR = BASE / "backend"
 LOGO_PATH = BASE / "assets" / "harvestshield_logo.png"
 
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
-
-from harvestshield_backend import HarvestShieldBackend
-from decision_engine import rank_batches
+from backend.harvestshield_backend import HarvestShieldBackend
+from backend.decision_engine import rank_batches
 
 
 # ============================================================

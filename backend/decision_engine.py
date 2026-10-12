@@ -113,6 +113,11 @@ def _priority_key(batch):
     )
 
 
+def rank_batches(batches):
+    """Use the same operational priority order in plans and dashboards."""
+    return sorted(batches, key=_priority_key, reverse=True)
+
+
 def generate_action_plan(
     batches,
     cold_storage_capacity,
@@ -180,11 +185,7 @@ def generate_action_plan(
     # RANK FIRST
     # --------------------------------------------------------
 
-    ranked = sorted(
-        batches,
-        key=_priority_key,
-        reverse=True
-    )
+    ranked = rank_batches(batches)
 
     plan = []
 

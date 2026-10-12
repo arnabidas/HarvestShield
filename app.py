@@ -1,5 +1,6 @@
 
 from pathlib import Path
+from copy import deepcopy
 import sys
 
 import pandas as pd
@@ -20,6 +21,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from harvestshield_backend import HarvestShieldBackend
+from decision_engine import rank_batches
 
 
 # ============================================================
@@ -419,6 +421,11 @@ button[kind="primary"] {
 # ============================================================
 # HELPERS
 # ============================================================
+
+def clear_simulation():
+    st.session_state.pop("simulation_results", None)
+    st.session_state.pop("simulation_inputs", None)
+
 
 def total_batches():
     return len(st.session_state.batches)
@@ -928,6 +935,7 @@ with st.sidebar:
         st.session_state.batches = []
 
         st.session_state.action_plan = None
+        clear_simulation()
 
         st.rerun()
 
@@ -1232,28 +1240,7 @@ How much configured capacity remains available.
 
         elif st.session_state.batches:
 
-            risk_rank = {
-                "HIGH": 3,
-                "MEDIUM": 2,
-                "LOW": 1
-            }
-
-
-            ranked = sorted(
-                st.session_state.batches,
-
-                key=lambda batch: (
-                    risk_rank[
-                        batch["risk"]
-                    ],
-
-                    batch[
-                        "risk_score"
-                    ]
-                ),
-
-                reverse=True
-            )
+            ranked = rank_batches(st.session_state.batches)
 
 
             for i, batch in enumerate(
@@ -1510,6 +1497,7 @@ elif page == "Analyze Batch":
 
 
                     st.session_state.action_plan = None
+                    clear_simulation()
 
 
                     st.success(
@@ -1643,14 +1631,7 @@ elif page == "Batch Intelligence":
     if not batches:
         st.info("No batches yet. Add tomato batches in Analyze Batch.")
     else:
-        ranked = sorted(
-            batches,
-            key=lambda b: (
-                {"HIGH": 3, "MEDIUM": 2, "LOW": 1}.get(b.get("risk"), 0),
-                float(b.get("risk_score", 0))
-            ),
-            reverse=True
-        )
+        ranked = rank_batches(batches)
         st.metric("Batches compared", len(ranked))
         st.dataframe(
             pd.DataFrame([
@@ -1708,6 +1689,15 @@ elif page == "Capacity Simulator":
             value=float(st.session_state.transport_capacity), step=10.0,
             key="sim_transport"
         )
+        simulation_inputs = (
+            st.session_state.batches,
+            st.session_state.cold_capacity,
+            st.session_state.transport_capacity,
+            sim_cold,
+            sim_transport,
+        )
+        if st.session_state.get("simulation_inputs") != simulation_inputs:
+            clear_simulation()
         if st.button("Compare capacity scenarios", type="primary"):
             try:
                 base = hs.generate_action_plan(
@@ -1721,6 +1711,7 @@ elif page == "Capacity Simulator":
                     transport_capacity=float(sim_transport)
                 )
                 st.session_state.simulation_results = (base, alternative)
+                st.session_state.simulation_inputs = deepcopy(simulation_inputs)
             except Exception as exc:
                 st.error("Scenario calculation failed.")
                 st.exception(exc)
@@ -1865,6 +1856,7 @@ elif page == "Resource Planner":
                 st.session_state.transport_capacity = (
                     transport
                 )
+                clear_simulation()
 
 
                 st.success(

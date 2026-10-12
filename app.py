@@ -1634,6 +1634,144 @@ elif page == "Analyze Batch":
 
 
 # ============================================================
+# BATCH INTELLIGENCE
+# ============================================================
+
+elif page == "Batch Intelligence":
+    st.caption("Compare analyzed tomato batches and identify intervention priorities.")
+    batches = st.session_state.batches
+    if not batches:
+        st.info("No batches yet. Add tomato batches in Analyze Batch.")
+    else:
+        ranked = sorted(
+            batches,
+            key=lambda b: (
+                {"HIGH": 3, "MEDIUM": 2, "LOW": 1}.get(b.get("risk"), 0),
+                float(b.get("risk_score", 0))
+            ),
+            reverse=True
+        )
+        st.metric("Batches compared", len(ranked))
+        st.dataframe(
+            pd.DataFrame([
+                {
+                    "Priority": i,
+                    "Batch": b.get("batch_id", ""),
+                    "Risk": b.get("risk", ""),
+                    "Risk score (heuristic)": b.get("risk_score", ""),
+                    "Quantity (kg)": b.get("quantity", 0),
+                    "Preliminary action": b.get("preliminary_action", "")
+                }
+                for i, b in enumerate(ranked, 1)
+            ]),
+            hide_index=True,
+            use_container_width=True
+        )
+        st.caption("Ranking uses the prototype risk category and score; it is not an optimized resource allocation.")
+        st.markdown("### Intervention priority")
+        if st.session_state.action_plan:
+            st.caption("Showing the last Resource Planner allocation. Regenerate after changing batches or capacities.")
+            for item in st.session_state.action_plan["plan"]:
+                render_priority(item)
+        else:
+            for i, b in enumerate(ranked, 1):
+                st.write(
+                    f"**#{i} — {b.get('batch_id', 'Batch')}** · "
+                    f"{b.get('risk', 'Unknown')} risk · "
+                    f"{b.get('preliminary_action', 'Review required')}"
+                )
+            st.info("Use Resource Planner to generate capacity-aware actions.")
+
+# ============================================================
+# CAPACITY SIMULATOR
+# ============================================================
+
+elif page == "Capacity Simulator":
+    st.caption("What-if analysis: compare two capacity scenarios using the existing decision engine.")
+    if not st.session_state.batches:
+        st.info("Analyze at least one batch before running a capacity scenario.")
+    else:
+        st.markdown("### Scenario A — current capacity")
+        st.write(
+            f"Cold storage: {st.session_state.cold_capacity:.0f} kg · "
+            f"Transport: {st.session_state.transport_capacity:.0f} kg"
+        )
+        st.markdown("### Scenario B — proposed capacity")
+        c1, c2 = st.columns(2)
+        sim_cold = c1.number_input(
+            "Scenario cold storage (kg)", min_value=0.0,
+            value=float(st.session_state.cold_capacity), step=10.0,
+            key="sim_cold"
+        )
+        sim_transport = c2.number_input(
+            "Scenario transport (kg)", min_value=0.0,
+            value=float(st.session_state.transport_capacity), step=10.0,
+            key="sim_transport"
+        )
+        if st.button("Compare capacity scenarios", type="primary"):
+            try:
+                base = hs.generate_action_plan(
+                    batches=st.session_state.batches,
+                    cold_storage_capacity=float(st.session_state.cold_capacity),
+                    transport_capacity=float(st.session_state.transport_capacity)
+                )
+                alternative = hs.generate_action_plan(
+                    batches=st.session_state.batches,
+                    cold_storage_capacity=float(sim_cold),
+                    transport_capacity=float(sim_transport)
+                )
+                st.session_state.simulation_results = (base, alternative)
+            except Exception as exc:
+                st.error("Scenario calculation failed.")
+                st.exception(exc)
+        if "simulation_results" in st.session_state:
+            base, alternative = st.session_state.simulation_results
+            left, right = st.columns(2)
+            with left:
+                st.markdown("### Scenario A")
+                st.metric("Cold storage remaining", f"{base['remaining_cold_storage']:.0f} kg")
+                st.metric("Transport remaining", f"{base['remaining_transport']:.0f} kg")
+                for item in base["plan"]:
+                    render_priority(item)
+            with right:
+                st.markdown("### Scenario B")
+                st.metric("Cold storage remaining", f"{alternative['remaining_cold_storage']:.0f} kg")
+                st.metric("Transport remaining", f"{alternative['remaining_transport']:.0f} kg")
+                for item in alternative["plan"]:
+                    render_priority(item)
+            st.caption("What-if results are prototype recommendations, not validated loss forecasts or globally optimal allocations.")
+
+# ============================================================
+# HOW HARVESTSHIELD WORKS
+# ============================================================
+
+elif page == "How HarvestShield Works":
+    st.markdown("### From visual condition to intervention priority")
+    st.markdown(
+        "**1. Analyze:** Upload a tomato image and enter temperature, "
+        "humidity, days since harvest and batch quantity."
+    )
+    st.markdown(
+        "**2. Assess condition:** The image model estimates the supported visual-condition class."
+    )
+    st.markdown(
+        "**3. Assess risk:** An explainable heuristic combines image output "
+        "with post-harvest context. The 0–100 score is not a spoilage probability."
+    )
+    st.markdown(
+        "**4. Plan:** The decision engine ranks batches and considers available "
+        "cold-storage and transport capacities."
+    )
+    st.markdown(
+        "**5. Act:** Review recommendations for sale, processing, transport, "
+        "storage or monitoring before making operational decisions."
+    )
+    st.info(
+        "Tomato V0.1 is a decision-support prototype. Recommendations require "
+        "field validation and human oversight."
+    )
+
+# ============================================================
 # RESOURCE PLANNER
 # ============================================================
 

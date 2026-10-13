@@ -17,6 +17,7 @@ LOGO_PATH = BASE / "assets" / "harvestshield_logo.png"
 
 from backend.harvestshield_backend import HarvestShieldBackend
 from backend.decision_engine import rank_batches
+from backend.ui_theme import CSS_VARIABLES
 
 
 # ============================================================
@@ -81,25 +82,14 @@ st.markdown(
     """
 <style>
 
-:root {
-    --bg: #090b0a;
-    --sidebar: #080a09;
-    --panel: #232524;
-    --panel-2: #1c1f1d;
-    --border: rgba(255,255,255,0.07);
-    --text: #f3f5f4;
-    --muted: #8d9690;
-    --lime: #a7ef4e;
-    --lime-dark: #78bf32;
-    --red: #ff6558;
-    --amber: #f3bc4b;
-}
+""" + CSS_VARIABLES + """
 
 html {
     scroll-behavior: smooth;
 }
 
 .stApp {
+    font-family: var(--font);
     background: var(--bg);
     color: var(--text);
 }
@@ -959,7 +949,7 @@ or remaining shelf life.
 PAGE_HEADERS = {
 
     "Machine Simulator": {
-        "title": "HarvestShield Machine Simulator",
+        "title": "Machine Simulator",
         "subtitle": "Explore inspection, sorting, risk bubbles and approved-only resource planning.",
         "pill": "Interactive Prototype"
     },
@@ -1740,7 +1730,7 @@ elif page == "Capacity Simulator":
 
 elif page == "Machine Simulator":
     from backend.simulator_component import render_simulator
-    st.caption("Machinery and crate scenarios are simulated. Uploaded tomato photos use the existing real model. Review and routing policies are prototype heuristics, not contamination probabilities.")
+    st.caption("Simulated inspection and sorting. Uploaded tomato photos use the tomato condition model.")
     render_simulator(hs)
 
 elif page == "How HarvestShield Works":
@@ -2058,17 +2048,19 @@ st.markdown('''
 <style>
 
 /* Deployment readability patch */
-.stButton > button,
 button[kind="primary"] {
     color: #000000 !important;
     font-weight: 800 !important;
 }
 
-.stButton > button *,
 button[kind="primary"] * {
     color: #000000 !important;
     fill: #000000 !important;
     opacity: 1 !important;
+}
+
+button[kind="secondary"], button[kind="secondary"] * {
+    color: var(--text) !important;
 }
 
 </style>

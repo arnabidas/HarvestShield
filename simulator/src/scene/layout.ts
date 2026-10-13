@@ -15,7 +15,7 @@ export const stations=[
   {name:'Approved packing',x:18,z:0,caption:'Only cleared items enter output crates, with every original source ID retained.'},
   {name:'Truck / storage',x:24.2,z:0,caption:'Approved output travels along the loading conveyor to eligible truck or storage allocation.'}
 ];
-export const routeColors:Record<Route,string>={APPROVED:'#a9da73',SECONDARY_SCREENING:'#eab950',ISOLATE_REJECT:'#d97666',HUMAN_REVIEW:'#a79ccd'};
+export const routeColors:Record<Route,string>={APPROVED:'#a7ef4e',SECONDARY_SCREENING:'#f3bc4b',ISOLATE_REJECT:'#ff6558',HUMAN_REVIEW:'#a79ccd'};
 export const routeDestination=(route:Route|null):Point=>route==='SECONDARY_SCREENING'?[15.3,1.16,-4.5]:route==='HUMAN_REVIEW'?[15.3,1.16,4.5]:route==='ISOLATE_REJECT'?[15.3,1.16,-7]:[18,1.16,0];
 export const laneZ=(lane:number)=>((lane-1)%20-9.5)*.34;
 export const waitingPosition=(slot:number):Point=>[2.5+(slot%8)*.4,1.16,-1.4+Math.floor(slot/8)*.4];

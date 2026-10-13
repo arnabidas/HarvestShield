@@ -44,6 +44,16 @@ in the prepared Python environment. Photo credits are in
 `docs/SAMPLE_PHOTO_CREDITS.md`. The standalone prototype can still be run separately;
 see `simulator/README.md`.
 
+### Dashboard design integration
+
+The machine workspace shares `assets/harvestshield_theme.json` with the Python
+dashboard: charcoal surfaces, lime actions, semantic amber/red status colors,
+Source Sans typography and consistent card radii. The native Streamlit theme is
+configured in `.streamlit/config.toml`. Embedded mode uses focused workspace tabs,
+retains run state across those tabs, and removes standalone branding/navigation
+duplication. Photo analysis opens from the workspace toolbar. The font is bundled
+locally with its SIL Open Font License; no external font service is required.
+
 ## Important limitations
 
 - Tomato-only prototype

@@ -1,0 +1,16 @@
+{
+  "bg": "#090b0a",
+  "sidebar": "#080a09",
+  "panel": "#252726",
+  "panel-2": "#1c1f1d",
+  "border": "rgba(255,255,255,0.07)",
+  "text": "#f3f5f4",
+  "muted": "#8d9690",
+  "lime": "#a7ef4e",
+  "lime-dark": "#78bf32",
+  "red": "#ff6558",
+  "amber": "#f3bc4b",
+  "font": "\"Source Sans Pro\", \"Source Sans 3\", sans-serif",
+  "radius": "20px",
+  "space": "24px"
+}

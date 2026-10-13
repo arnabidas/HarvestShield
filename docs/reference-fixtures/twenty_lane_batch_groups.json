@@ -1,0 +1,21 @@
+{
+  "schemaVersion":"0.1-proposed-fixture",
+  "scenarioId":"HS-20-LANE-CONCURRENCY",
+  "seed":20020,
+  "mode":"SYNTHETIC_FIXTURE",
+  "machine":{"laneCount":20,"assignmentMode":"BATCH_SEPARATED_DYNAMIC","crateCompletionBarrier":true},
+  "batches":[
+    {"batchId":"BATCH-A","commodityId":"tomato","initialLaneIds":[1,2,3,4,5]},
+    {"batchId":"BATCH-B","commodityId":"apple","initialLaneIds":[6,7,8,9,10,11]},
+    {"batchId":"BATCH-C","commodityId":"potato","initialLaneIds":[12,13,14,15,16]},
+    {"batchId":"BATCH-D","commodityId":"tomato","initialLaneIds":[17,18,19,20]}
+  ],
+  "assertions":[
+    "Each lane belongs to at most one batch at a time",
+    "A lane can change batch only when empty and cleared",
+    "One batch contains one commodity",
+    "Separate crate completion barriers prevent premature sorting",
+    "20 lanes do not imply 20x throughput because upstream bottlenecks apply",
+    "Synthetic apple/potato classification never claims tomato real-model provenance"
+  ]
+}

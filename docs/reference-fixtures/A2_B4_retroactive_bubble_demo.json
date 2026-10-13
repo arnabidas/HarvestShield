@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "0.1-proposed-fixture",
+  "scenarioId": "HS-JUDGE-A2-B4",
+  "title": "Later layer rot changes earlier item inspection priority",
+  "purpose": "SPECIFICATION REFERENCE ONLY; the target TypeScript engine may adapt and version this shape.",
+  "seed": 102026,
+  "mode": "SYNTHETIC_FIXTURE",
+  "warehouse": {
+    "warehouseId": "WH-DEMO-01",
+    "coldCapacityGrams": 180000,
+    "truckCapacityGrams": 90000,
+    "temperatureHistoryC": [15, 15.5, 16],
+    "relativeHumidityHistoryPct": [88, 90, 91],
+    "ethyleneHistory": null
+  },
+  "batches": [
+    {
+      "batchId": "B101",
+      "commodityId": "tomato",
+      "declaredMassGrams": 12000,
+      "crates": [{
+        "crateId": "C01",
+        "expectedCount": 6,
+        "expectedMassGrams": 12000,
+        "layers": [
+          {"layerIndex": 1, "items": [
+            {"itemId": "B101-C01-L01-I01", "alias": "A1", "x": 0.18, "y": 0.22, "syntheticMassGrams": 2000, "sourceVisualLabel": "GOOD"},
+            {"itemId": "B101-C01-L01-I02", "alias": "A2", "x": 0.50, "y": 0.50, "syntheticMassGrams": 2000, "sourceVisualLabel": "GOOD"},
+            {"itemId": "B101-C01-L01-I03", "alias": "A3", "x": 0.82, "y": 0.78, "syntheticMassGrams": 2000, "sourceVisualLabel": "GOOD"}
+          ]},
+          {"layerIndex": 2, "items": [
+            {"itemId": "B101-C01-L02-I01", "alias": "B3", "x": 0.18, "y": 0.22, "syntheticMassGrams": 2000, "sourceVisualLabel": "GOOD"},
+            {"itemId": "B101-C01-L02-I02", "alias": "B4", "x": 0.52, "y": 0.51, "syntheticMassGrams": 2000, "sourceVisualLabel": "BAD", "visibleRotSeverity": 1.0},
+            {"itemId": "B101-C01-L02-I03", "alias": "B5", "x": 0.85, "y": 0.82, "syntheticMassGrams": 2000, "sourceVisualLabel": "GOOD"}
+          ]}
+        ]
+      }]
+    }
+  ],
+  "riskPolicy": {
+    "source": "HYPOTHETICAL_TUNING_NOT_BIOLOGICAL_PROBABILITY",
+    "alpha": 7,
+    "beta": 1.1,
+    "severityWeight": 1,
+    "inspectionPriorityThreshold": 0.20,
+    "multipleBubbleCombination": "oneMinusProduct"
+  },
+  "expectedMilestones": [
+    "LAYER_MAPPED:1",
+    "ITEM_VISUAL_CLASSIFIED:A2:GOOD",
+    "ITEM_BUFFERED:A2",
+    "LAYER_MAPPED:2",
+    "DEFECT_FLAGGED:B4",
+    "BUBBLE_CREATED:B4",
+    "NEIGHBOR_PRIORITY_UPDATED:A2",
+    "CRATE_RECONCILED:C01",
+    "ITEM_ROUTE_FINALIZED:A2:SECONDARY_SCREENING"
+  ],
+  "assertions": [
+    "A2 original sourceVisualLabel remains GOOD",
+    "A2 final route is SECONDARY_SCREENING",
+    "All six items have unique persistent IDs",
+    "No normal sorting events precede CRATE_RECONCILED",
+    "Input item count equals sum of mutually exclusive outcomes",
+    "Only approved quantities enter dispatch planning"
+  ]
+}

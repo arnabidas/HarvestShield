@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+simulator/node_modules/
+simulator/test-results/
+simulator/playwright-report/
+runtime/
+docs/evidence/

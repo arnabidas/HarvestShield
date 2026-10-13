@@ -1,0 +1,2 @@
+import { defineConfig } from 'vitest/config';
+export default defineConfig({ base: './',server:{proxy:{'/api/inference':{target:'http://127.0.0.1:4174',changeOrigin:false},'/api/session':{target:'http://127.0.0.1:4173',changeOrigin:false},'/api/operator':{target:'http://127.0.0.1:4173',changeOrigin:false}}}, test: { include: ['tests/unit/**/*.test.ts'],maxWorkers:1 }, build: {chunkSizeWarningLimit: 1200,rollupOptions:{output:{manualChunks:{'three-view':['three','@react-three/fiber','@react-three/drei'],'validation':['zod']}}}} });

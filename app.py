@@ -891,6 +891,7 @@ with st.sidebar:
             "Batch Intelligence",
             "Resource Planner",
             "Capacity Simulator",
+            "Machine Simulator",
             "How HarvestShield Works",
             "Validation"
         ]
@@ -956,6 +957,12 @@ or remaining shelf life.
 # ============================================================
 
 PAGE_HEADERS = {
+
+    "Machine Simulator": {
+        "title": "HarvestShield Machine Simulator",
+        "subtitle": "Explore inspection, sorting, risk bubbles and approved-only resource planning.",
+        "pill": "Interactive Prototype"
+    },
 
     "Overview": {
         "title": "Dashboard Overview",
@@ -1730,6 +1737,11 @@ elif page == "Capacity Simulator":
 # ============================================================
 # HOW HARVESTSHIELD WORKS
 # ============================================================
+
+elif page == "Machine Simulator":
+    from backend.simulator_component import render_simulator
+    st.caption("Machinery and crate scenarios are simulated. Uploaded tomato photos use the existing real model. Review and routing policies are prototype heuristics, not contamination probabilities.")
+    render_simulator(hs)
 
 elif page == "How HarvestShield Works":
     st.markdown("### From visual condition to intervention priority")

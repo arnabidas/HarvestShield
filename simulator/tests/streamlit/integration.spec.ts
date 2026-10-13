@@ -19,7 +19,8 @@ test('embedded machine runs, preserves approved-only planning, bubbles and expor
     // Community Cloud telemetry can fail behind restricted egress. Keep checking
     // every application error; exclude only the identified platform tracker.
     const telemetry = e.message === 'Failed to fetch' &&
-      /\/static\/js\//.test(e.stack ?? '') && /\.sendPendingEvents/.test(e.stack ?? '');
+      /\/static\/js\//.test(e.stack ?? '') &&
+      /\.track/.test(e.stack ?? '') && /\.send/.test(e.stack ?? '');
     if (!telemetry) errors.push(e.message);
   });
   const {machine} = await openMachine(page);

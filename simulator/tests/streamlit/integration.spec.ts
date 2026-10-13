@@ -15,7 +15,13 @@ async function openMachine(page: Page) {
 
 test('embedded machine runs, preserves approved-only planning, bubbles and exports', async ({page}) => {
   const errors: string[] = [];
-  page.on('pageerror', e => errors.push(e.message));
+  page.on('pageerror', e => {
+    // Community Cloud telemetry can fail behind restricted egress. Keep checking
+    // every application error; exclude only the identified platform tracker.
+    const telemetry = e.message === 'Failed to fetch' &&
+      /\/static\/js\//.test(e.stack ?? '') && /\.sendPendingEvents/.test(e.stack ?? '');
+    if (!telemetry) errors.push(e.message);
+  });
   const {machine} = await openMachine(page);
   await expect(machine.locator('canvas')).toBeVisible();
   await machine.getByRole('button', {name: 'Finish run', exact: true}).click();
